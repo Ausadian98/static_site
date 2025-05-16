@@ -1,0 +1,194 @@
+We start off talking about taking raw markdown strings and converting to TextNodes.
+
+Example:
+    This is text with a **bolded phrase** in the middle
+
+and conerting it to the output as a list.
+    [
+        TextNode("This is text with a ", TextType.Text),
+        TextNode("bolded phrase", TextType.BOLD),
+        TextNode(" in the middle", TextType.TEXT)
+    ]
+
+This looks all good it gives us a good idea of what we are trying to do.
+we are breaking up our raw markdown string into sections of formating.
+
+We want to make the **bolded phrase** section bold and leave the outside
+as plane text.
+
+We then talk about not handing nested inline elements. This is practical
+currently as we don't have a method of handling more than one TextType.
+
+
+
+
+Assignment
+
+Now we are advised to make a new function and to put it anywhere likely a new file.
+
+The new function should be:
+    def split_nodes_delimiter(old_nodes, delimiter, text_type)
+
+So we are likely going to want to import some other items like our TextNode
+into this file. This should be fairly well known by now as we have practiced this
+a few times already.
+
+This is where Step 1 should end, we have created the file imported TextNodes
+and started the function.
+
+Now we are thinking of what do do with the arguments we have got from the function.
+
+The next line states:
+    It takes a list of "old_nodes", a delimiter, and a text_type. It should return a new list of nodes,
+    where any "text" type nodes in the input list are (potentially) split into multiple nodes based one
+    the syntax. For example, given the following input:
+
+    node = TextNode("This is a text with a `code block` word", TextType.TEXT)
+    new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
+
+    new_nodes becomes:
+
+    [
+        TextNode("This is text with a ", TextType.TEXT),
+        TextNode("code block", TextType.CODE),
+        TextNode(" word", TextType.TEXT),
+    ]
+
+    The beauty of this function is that it will take care of inline code, bold, and italic text, all
+    in one! The logic is identical, the delimiter and matching text_type are the only thing that changes,
+    eg: ** for bold, _ for italic, and a backtick for code. Also, because it operates on an input list,
+    we can call it multiple times to handle different types of delimiters. The order in which you check for
+    different delimiters matters, which actually simplifies implementation.
+
+First off. This is a LOT of text! it is also about 5-6 steps just in the mess of it all. It is very
+hard to read and break apart with the way it is written. Not impossible but not great either for someone
+trying to understand the concept and you need the rosetta stone to decipher the assignment.
+
+In the lesson we are given a raw markdown string example:
+    This is an _italic and **bold** word_.
+
+However now in the assignment we are given:
+    node = TextNode("This is text with a `code block` word", TextType.TEXT)
+
+How did this node block come to exist?
+Are we building this node block? We find out that no this is the example input.
+so very easily this can be confused as the next part of the function.
+Why wasn't this the example rather than the "This is an _italic and **Bold** word_"
+
+Mabe the Nodes example could even be expanded to show situation with more nodes.
+
+    node = [
+        TextNode("This is text with a `code block` word", TextType.TEXT),
+        TextNode("This is text with a **Bold block** word", TextType.BOLD),
+    ]
+
+Given the learner a more rounded example of what to expect to be passed into the function.
+
+We are also given how the function is called and passed data.
+This is how you would use the function later in the overall project.
+   new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
+
+Now this only really gives us an example of handling TextType.CODE.
+But what of other TextTypes? In the next paragraph.
+We are told that:
+    The beauty of this function is that it will take care of inline code, bold, and italic text all in one!
+
+We don't have a working function yet we have to build that! and while we can write the function
+the same for each of those just replacing TextType.TEXT with BOLD and CODE. We haven't really been
+explained how this is supposed to be happening? Do we just do it any way we can think of?
+I can imagine a lot of spaghetti code if this is the case everyone doing it drastically differently.
+
+You could do it with a bunch of if-elif-else statements. What about a match case system?
+
+From here we are kinda flying blind <insert blinkin guessing>
+There isn't a lot to go on and while we know loops, if-elif-else, match or other elements we haven't really
+been shown the structure of putting it together like this.
+
+By reading the tips we get a few things we didn't know we even had to account for.
+    If an "old_node" is NOT a TextType.TEXT type (read that 10x fast) just add it to the new list as-is,
+    we only attempt to split "text" type objects (not bold, italic, etc).
+
+Ok that is good to know. might have been handy earlier and kinda changes a bit about how we understand
+what this function is to actually do! We might want to check if the TextType is TEXT first before we do anything.
+
+Next tip we have:
+    If a matching closing delimiter is not found, just raise an exception with a helpful error message,
+    that's invalid Markdown syntax.
+
+ok so this is also kinda important we need a way to note if we get a starting delimiter and an ending one.
+So if i was to have the string "This **is, a string" my delimiter would split the string on ** if i set it
+up that way. You would get "This" and then "is, a string"
+
+    
+    string = "This **is, a string"
+
+    print(string)
+    This **is, a string
+
+    print(string.split("**"))
+    ['This ', 'is, a string']
+
+So we likely also now need some sort of sanitizer function first to make sure we have open\closing delimiters.
+
+We then have the tip:
+    the split() string method was useful.
+
+Ok this is a good tip as it gives us feedback more along the lines of "Remember the course on split strings.
+if you don't remember go back and run through that course again or read in the spellbook how it works."
+
+And finally we have:
+    The .extend() list method was useful.
+
+Ok again this is a good tip. However we have never used extend before (that i could find.)
+So while reading the very short explaination is helpful a bit. It would be nice to actually have some
+instruction on how to use it. This would be like a teacher saying Multiplication is adding up groups of 
+an object now go figure it out!
+
+Now not wanting to give pseudocode here is a bit problematic. While you want the learners to work through
+it themselves are we really at that stage yet? I feel we haven't done a great job of working through
+the structure of putting all of this together.
+
+Finally we get to step 2.
+    write a bunch of tests. Be sure to test various types of delimiters.
+
+How much confidence do we have in writing any tests?
+We were only just introduced to testing in this project and for the most part we haven't really done a job explaining them.
+We want to test obviously multiple Texttypes BOLD, Italic, Code, Text. Is there any we don't want to test because we haven't
+accounted for that one yet?
+We could do with greater info on testing and what options we have for creating tests? what are good tests?
+What are bad tests? What should i be watching out for when making tests? Testing is EXTREMELY important but it seems
+fairly glazed over here. No wonder software has so many bugs in it!!!!!
+
+
+---------------------------------------------------------------------------
+
+
+Talking to boots
+
+---------------------------------------------------------------------------
+
+Soooooo this changes it all up completely.
+
+expand is not what we originally thought it was.
+This is basically append() and i don't think we have seen this before.
+
+This is for adding to a list.
+    list = ["Strawberry", "Pear"]
+    list.extend(["apple", "Banana"])
+
+So we are adding a list of elements to another list basically.
+This would be important to know beforehand.
+
+
+We now also learn that the delimiter finding is also a lot more involved
+than we thought. 
+
+Talking to boots we want to use text.find(delimiter)
+Have we ever used text.find?
+how would we known this was an option?
+why is this a tip and not a direction in the assignment it kinda seems important.
+This is where it makes me wonder if we need to do a python course to do this python course.
+
+Boots brings up a good point. Are we supposed to handle more than 1 set of delimiters?
+
+
